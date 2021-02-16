@@ -50,28 +50,38 @@ symbols = ['AAL', 'AAPL', 'AAP', 'ABBV', 'ABC', 'ABT', 'ACN', 'ADBE', 'ADI',
        'SPG', 'SRCL', 'SRE', 'STI', 'STT', 'STX', 'STZ', 'SWKS', 'SWK',
        'SYF', 'SYK', 'SYMC', 'SYY', 'TAP', 'TDG', 'TEL', 'TGT', 'TIF',
        'TJX', 'TMK', 'TMO', 'TPR', 'TRIP', 'TROW', 'TRV', 'TSCO', 'TSN',
-       'TSS', 'TWX', 'TXN', 'TXT', 'T', 'UAA', 'UAL', 'UA', 'UDR', 'UHS',
        'ULTA', 'UNH', 'UNM', 'UNP', 'UPS', 'URI', 'USB', 'UTX', 'VAR',
+       'TSS', 'TWX', 'TXN', 'TXT', 'T', 'UAA', 'UAL', 'UA', 'UDR', 'UHS',
        'VFC', 'VIAB', 'VLO', 'VMC', 'VNO', 'VRSK', 'VRSN', 'VRTX', 'VTR',
        'VZ', 'V', 'WAT', 'WBA', 'WDC', 'WEC', 'WFC', 'WHR', 'WLTW', 'WMB',
        'WMT', 'WM', 'WRK', 'WU', 'WYNN', 'WYN', 'WY', 'XEC', 'XEL',
        'XLNX', 'XL', 'XOM', 'XRAY', 'XRX', 'XYL', 'YUM', 'ZBH', 'ZION',
-       'ZTS']
+       'ZTS', 'PETR4.SA', 'VALE3', 'BOVA11.SA']
 
 symbols.append('SPY')
 
-if not os.path.exists('data'):
-    os.mkdir('data')
+if not os.path.exists('data/interim'):
+    os.mkdir('data/interim')
+
+lst_delist = []
 
 for symbol in symbols:
-    if not os.path.exists(f"data/{symbol}.csv"):
-        data = yf.download(symbol, start="2010-01-01", end="2018-12-31")
+    if not os.path.exists(f"data/interim/{symbol}.csv"):
+        data = yf.download(symbol, start="2010-01-01", end="2020-12-31")
         if data.size > 0:
-            data.to_csv(f"data/{symbol}.csv")
+            data.to_csv(f"data/interim/{symbol}.csv")
         else:
             print("Not saving...")
+            lst_delist.append(symbol)
             
 for symbol in symbols:
-    s = open(f"data/{symbol}.csv").readlines()
-    if len(s) < 10:
-        os.system(f"rm data/{symbol}.csv")
+    try:
+        s = open(f"data/interim/{symbol}.csv").readlines()
+        if len(s) < 10:
+            os.system(f"rm data/interim/{symbol}.csv")
+    except:
+        print(f"{symbol}.csv does not exist.")
+        continue
+
+lst_delist = pd.DataFrame(lst_delist)
+lst_delist.to_csv('./data/interim/lst_delist.txt', index=False)
